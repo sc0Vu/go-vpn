@@ -1,23 +1,23 @@
 package main
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/therecipe/qt/gui"
 	"github.com/therecipe/qt/widgets"
 )
 
-func main() {
-
-	app := widgets.NewQApplication(len(os.Args), os.Args)
-
+func createSettingWindow() *widgets.QMainWindow {
 	window := widgets.NewQMainWindow(nil, 0)
 	window.SetMinimumSize2(250, 200)
-	window.SetWindowTitle("VPN Client")
+	window.SetWindowTitle("Setting")
+	return window
+}
 
+func createSettingWidget() *widgets.QWidget {
 	widget := widgets.NewQWidget(nil, 0)
 	widget.SetLayout(widgets.NewQVBoxLayout())
-	window.SetCentralWidget(widget)
 
 	input := widgets.NewQLineEdit(nil)
 	input.SetPlaceholderText(".......")
@@ -28,20 +28,26 @@ func main() {
 		widgets.QMessageBox_Information(nil, "OK", input.Text(), widgets.QMessageBox__Ok, widgets.QMessageBox__Ok)
 	})
 	widget.Layout().AddWidget(button)
+	return widget
+}
+
+func main() {
+
+	app := widgets.NewQApplication(len(os.Args), os.Args)
+
+	settingWindow := createSettingWindow()
+	settingWidget := createSettingWidget()
+	settingWindow.SetCentralWidget(settingWidget)
 
 	// add context menu and trayicon
 	menu := widgets.NewQMenu(nil)
-	minAction := menu.AddAction("Min")
-	minAction.ConnectTriggered(func(bool) {
-		window.ShowNormal()
+	aboutAction := menu.AddAction("About")
+	aboutAction.ConnectTriggered(func(bool) {
+		widgets.QMessageBox_About(nil, "About Go VPN", fmt.Sprintf("GO VPN v0.0.1\n\nBuilded with qt v6.1.0.\n\nNote: It's still in development. Use at your own risk.\n\n"))
 	})
-	maxAction := menu.AddAction("Max")
-	maxAction.ConnectTriggered(func(bool) {
-		window.ShowMaximized()
-	})
-	hideAction := menu.AddAction("Hide")
-	hideAction.ConnectTriggered(func(bool) {
-		window.Hide()
+	settingAction := menu.AddAction("Setting")
+	settingAction.ConnectTriggered(func(bool) {
+		settingWindow.Show()
 	})
 	menu.AddSeparator()
 	closeAction := menu.AddAction("Close")
@@ -54,10 +60,9 @@ func main() {
 	trayIcon.SetContextMenu(menu)
 	trayIcon.SetIcon(icon)
 	trayIcon.SetToolTip("VPN client")
-	widget.SetWindowIcon(icon)
+	settingWidget.SetWindowIcon(icon)
 
 	trayIcon.Show()
-	window.Show()
 
 	app.Exec()
 }
