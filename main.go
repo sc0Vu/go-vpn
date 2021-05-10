@@ -140,5 +140,6 @@ func main() {
 
 	trayIcon.Show()
 
+	app.SetQuitOnLastWindowClosed(false)
 	app.Exec()
 }
