@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/therecipe/qt/core"
 	"github.com/therecipe/qt/gui"
 	"github.com/therecipe/qt/widgets"
 )
@@ -20,14 +21,26 @@ func createSettingWidget() *widgets.QWidget {
 	widget.SetLayout(widgets.NewQVBoxLayout())
 
 	input := widgets.NewQLineEdit(nil)
-	input.SetPlaceholderText(".......")
+	input.SetPlaceholderText("Please select file")
+	input.SetEnabled(false)
 	widget.Layout().AddWidget(input)
 
-	button := widgets.NewQPushButton2("click", nil)
-	button.ConnectClicked(func(bool) {
-		widgets.QMessageBox_Information(nil, "OK", input.Text(), widgets.QMessageBox__Ok, widgets.QMessageBox__Ok)
+	fileButton := widgets.NewQPushButton2("Select .ovpn file", nil)
+	fileButton.ConnectClicked(func(bool) {
+		fileDialog := widgets.NewQFileDialog(nil, core.Qt__Window)
+		fileName := fileDialog.GetOpenFileName(nil, "Select .ovpn file", "", "*.ovpn", "", widgets.QFileDialog__ReadOnly)
+		input.SetPlaceholderText(fileName)
+		fileButton.SetEnabled(false)
+		startButton.SetEnabled(true)
 	})
-	widget.Layout().AddWidget(button)
+	widget.Layout().AddWidget(fileButton)
+
+	startButton := widgets.NewQPushButton2("Start", nil)
+	startButton.ConnectClicked(func(bool) {
+		// start vpn
+	})
+	startButton.SetEnabled(false)
+	widget.Layout().AddWidget(startButton)
 	return widget
 }
 
